@@ -36,12 +36,10 @@ public class AccountMaintenance {
         long accountnumber = scanner.nextLong();
        MainAccountDao mainDao = new MainAccountDao();
 
-        mainDao.getMainAccountByAcc(accountnumber);
+       MainAccount mainaccount = mainDao.getMainAccountByAcc(accountnumber);
 
-      IMainAccountDao imainaccountdao = DaoFactory.getMainAccountDao();
-       MainAccount mainaccount =  imainaccountdao.getMainAccountByAcc(accountnumber);
         System.out.println(mainaccount.toString());
-       System.out.println(mainaccount.getAccountNumber() + " , " + mainaccount.getBalance() + " ," + mainaccount.getAccountType());
+//       System.out.println(mainaccount.getAccountNumber() + " , " + mainaccount.getBalance() + " ," + mainaccount.getAccountType());
        // IMainAccountDao account = new MainAccountDao();
         //account.getMainAccountByAcc(accountnumber);
         //StudentDao studentDao = new StudentDaoImpl();

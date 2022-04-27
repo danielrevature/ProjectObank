@@ -16,11 +16,12 @@ public class TransactionsDao implements ITransactionsDao{
     @Override
     public List<Transactions> getAllTransactions() {
         List<Transactions> transactions = new ArrayList<>();
-        String sql = "Select u.firstname + ' ' + u.lastname as Customer, t.accountnumber , t.createdon, t.description, t.amount from Transactions t inner join users u on t.userId = u.userid ;";
+        String sql = "Select u.firstname + ' ' + u.lastname as Customer, t.accountnumber , t.createdon, t.description, t.amount from Transactions t inner join users u on t.userid = u.userid;";
         try{
-            PreparedStatement preparedStatement = connection.prepareStatement("sql");
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
+                resultSet.next();
                 Transactions trans = getTransaction(resultSet);
                 transactions.add(trans);
 
@@ -39,10 +40,10 @@ public class TransactionsDao implements ITransactionsDao{
 
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            ResultSet resultSet = preparedStatement.executeQuery();
             preparedStatement.setLong(1, id);
-
+            ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
+                resultSet.next();
                 Transactions transaction = getTransaction(resultSet) ;
                 return transaction;
             }
@@ -58,7 +59,7 @@ public class TransactionsDao implements ITransactionsDao{
     public void insert(Transactions transactions) {
         String sql = "Insert into transactions (userid,accountNumber,transactionType,amount,description,createdon) values(?,?,?,?,?,?);";
         try{
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             preparedStatement.setInt(1,transactions.getUserid());
             preparedStatement.setLong(2,transactions.getAccountNumber());
             preparedStatement.setString(3,transactions.getTransactionType());
@@ -82,10 +83,9 @@ public class TransactionsDao implements ITransactionsDao{
 
     @Override
     public void update(Transactions transactions) {
-        String sql = "Update Transactions set accountNumber =? ,transactiontype = ?,amount = ?,description = ?,createdon =?;";
+        String sql = "Update Transactions set accountNumber = ?, transactiontype = ?, amount = ?, description = ?, createdon = ?;";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,transactions.getUserid());
             preparedStatement.setLong(2,transactions.getAccountNumber());
             preparedStatement.setString(3,transactions.getTransactionType());
             preparedStatement.setBigDecimal(4,transactions.getAmount());
@@ -102,12 +102,12 @@ public class TransactionsDao implements ITransactionsDao{
     }
 
     @Override
-    public void delete(int id) {
+    public void delete(long id) {
 
-        String sql = "Delete from Transactions where AccountNumber = ?;";
+        String sql = "Delete from Transactions where accountnumber = ?;";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
-            preparedStatement.setInt(1,  id);
+            preparedStatement.setLong(1,  id);
             int count = preparedStatement.executeUpdate();
             if(count == 1) {
                 System.out.println("Record deleted successfully!");
@@ -133,7 +133,7 @@ public class TransactionsDao implements ITransactionsDao{
     @Override
     public void insertMain(MainAccount mainaccount)
     {
-        String sql = "Insert into MainAccount (userid, accountNumber,accounttype,balance,lastupdated) values(?,?,?,?,?); ";
+        String sql = "Insert into MainAccount (userid, accountNumber,accounttype,balance,lastupdated) values(?,?,?,?,?);";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(sql);
             preparedStatement.setInt(1, mainaccount.getUserId() );

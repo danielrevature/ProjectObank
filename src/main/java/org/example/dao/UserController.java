@@ -20,6 +20,7 @@ public class UserController implements IUserDao{
     public UserController(){
         connection = ConnectionFactory.getConnection();
     }
+
     @Override
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
@@ -28,6 +29,7 @@ public class UserController implements IUserDao{
            PreparedStatement preparedStatement = connection.prepareStatement(query);
            ResultSet resultSet = preparedStatement.executeQuery();
            while(resultSet.next()){
+               resultSet.next();
                User user = getUser(resultSet);
                users.add(user);
            }
@@ -48,6 +50,8 @@ public class UserController implements IUserDao{
             String password = resultSet.getString("password");
             String usertype = resultSet.getString("userType");
             Timestamp createdon = resultSet.getTimestamp("createdon");
+            User user = new User(userid, firstname, lastname, username, password, usertype, createdon);
+            return user;
         } catch (SQLException ex) {
             ex.printStackTrace();
         }
@@ -56,14 +60,14 @@ public class UserController implements IUserDao{
 
     @Override
     public User getUserById(int id) {
-        String query = "Select * from users where userId = ?;";
+        String query = "Select * from users where userid = ?;";
         try{
             PreparedStatement preparedStatement = connection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery();
             preparedStatement.setInt(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
             if(resultSet.next()){
+                resultSet.next();
                 User user = getUser(resultSet);
-
                 return user;
             }
         }
@@ -92,7 +96,7 @@ public class UserController implements IUserDao{
                 ResultSet resultSet = preparedStatement.getGeneratedKeys();
 
                 resultSet.next();
-                int id = resultSet.getInt(1);
+                int id = resultSet.getInt("userid");
                 user.setUserId(id);
                 System.out.println("Added new ID:" + id);
                 NewRegistration.tranUserId(id);
@@ -110,7 +114,7 @@ public class UserController implements IUserDao{
 
     @Override
     public void update(User user) {
-        String query = "Update Users set firstName = ?,lastName = ?,userName = ?,password = ?,userType = ?;";
+        String query = "Update Users set firstName = ?, lastName = ?, userName = ?, password = ?, userType = ?;";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setString(1, user.getFirstName());
@@ -131,7 +135,7 @@ public class UserController implements IUserDao{
 
     @Override
     public void delete(int id) {
-        String query = "Delete from Users where UserId = ?;";
+        String query = "Delete from Users where Userid = ?;";
         try {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.setInt(1,  id);
@@ -152,7 +156,6 @@ public class UserController implements IUserDao{
 
     public User loginCheck(ResultSet resultSet) {
         try {
-
             String username = resultSet.getString("userName");
             String password = resultSet.getString("password");
             return new User(username,password);
@@ -174,6 +177,7 @@ public class UserController implements IUserDao{
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if(resultSet.next()) {
+                resultSet.next();
                 User user = loginCheck(resultSet);
                 found = true;
             }

@@ -14,7 +14,7 @@ public interface ITransactionsDao {
 
     public void insert(Transactions transactions);
     public void update(Transactions transactions);
-    public void delete(int id);
+    public void delete(long id);
     public void insertMain(MainAccount mainaccount);
     public Transactions getTransaction(ResultSet resultSet);
 }
